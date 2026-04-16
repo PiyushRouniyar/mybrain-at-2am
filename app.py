@@ -76,53 +76,34 @@ Return ONLY JSON:
 """
 
 def parse_ai_response(text, thought, mode="funny"):
-    # ... (existing robust parsing logic)
-    """Extracts JSON from the AI response with multiple fallback layers to ensure stability."""
-    # Debug: Print raw response to console
-    logger.info(f"--- RAW AI RESPONSE ---\n{text}\n-----------------------")
+    logger.info(f"RAW RESPONSE: {text}")
 
-    # The 'Safe Fallback' so the frontend never crashes
-    fallback_data = {
-        "steps": [
-            f"Hmm, why am I worried about '{thought}'? 🤔",
-            "What if this is the start of a trend? 📉",
-            "I should probably check my emails again... 😬",
-            "Maybe I'll just stay in bed forever. 🏠",
-            "Wait, I was overthinking that, wasn't I? 😅"
-        ],
-        "mood": "neutral"
-    }
+    import re, json
 
     try:
-        # Layer 1: Direct JSON extraction
-        # We look for the first '{' and the last '}'
+        # Try JSON first
         match = re.search(r'\{.*\}', text, re.DOTALL)
         if match:
-            clean_json = match.group()
-            data = json.loads(clean_json)
-            
-            # Validation: Ensure it has steps and mood
-            if "steps" in data and isinstance(data["steps"], list) and len(data["steps"]) >= 1:
-                # Ensure we have exactly 5 steps (pad or trim)
+            data = json.loads(match.group())
+            if "steps" in data:
                 return {
                     "steps": data["steps"],
                     "mood": data.get("mood", "funny")
                 }
-        # Layer 2: Plain text split (if AI returns lines instead of JSON)
-        lines = [line.strip() for line in text.split('\n') if len(line.strip()) > 5]
-        if len(lines) >= 3:
-            logger.warning("AI failed JSON format, but returned lines. Converting to JSON.")
-            return {
-                "steps": lines[:5],
-                "mood": "neutral"
-            }
 
     except Exception as e:
-        logger.error(f"Critcal parsing error: {e}")
+        logger.warning(f"JSON parsing failed: {e}")
 
-    # Layer 3: Return the fallback if all else fails
-    logger.warning("Using hardcoded fallback response.")
-    return fallback_data
+    # 🔥 MAIN FIX: ALWAYS USE RAW TEXT
+    clean_text = text.strip()
+
+    if not clean_text:
+        clean_text = f"bro what even is '{thought}' 💀"
+
+    return {
+        "steps": [clean_text],
+        "mood": "funny"
+    }
 
 def generate_steps(thought, mode="funny"):
     """Calls Gemini and handles logic failures."""
