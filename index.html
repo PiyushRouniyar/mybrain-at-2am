@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧠 my brain at 2AM</title>
+    <link href="https://fonts.googleapis.com/css2?family=Gloria+Hallelujah&family=Patrick+Hand&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        :root {
+            --paper: #fffef0;
+            --pink: #ff85a1;
+            --blue: #4cc9f0;
+            --yellow: #ffee32;
+            --green: #81b29a;
+            --purple: #b79ced;
+            --ink: #333333;
+            --accent: var(--yellow);
+        }
+
+        /* Mode Themes */
+        body.dark-mode { --paper: #1a1a1a; --ink: #ffffff; --accent: var(--purple); }
+        body.calm-mode { --paper: #f0fdf4; --ink: #166534; --accent: var(--green); }
+        body.funny-mode { --paper: #fffef0; --ink: #333333; --accent: var(--yellow); }
+        body.insanity-mode { --paper: #fff1f2; --ink: #9f1239; --accent: var(--pink); }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Patrick Hand', cursive; }
+
+        body {
+            background-color: var(--paper);
+            background-image: 
+                radial-gradient(var(--ink) 0.5px, transparent 0),
+                linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
+            background-size: 30px 30px;
+            color: var(--ink);
+            min-height: 100vh;
+            padding: 40px 20px;
+            overflow-x: hidden;
+            transition: all 0.5s ease;
+        }
+
+        /* --- Animations --- */
+        /* --- Core Animations --- */
+        @keyframes popIn {
+            0% { transform: scale(0) rotate(-15deg); opacity: 0; }
+            70% { transform: scale(1.1) rotate(5deg); opacity: 1; }
+            100% { transform: scale(1) rotate(var(--rot)); opacity: 1; }
+        }
+
+        @keyframes wiggle { 0%, 100% { transform: rotate(-2deg); } 50% { transform: rotate(3deg); } }
+        @keyframes drift {
+            from { transform: translateY(110vh) rotate(0deg); opacity: 0.6; }
+            to { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+        }
+        @keyframes glowPulse { 
+            0% { box-shadow: 0 0 5px var(--pink); } 
+            100% { box-shadow: 0 0 25px var(--pink), 0 0 40px var(--pink); border-color: var(--pink); } 
+        }
+
+        @keyframes letterShake {
+            0%, 100% { transform: translate(0,0) rotate(0deg); }
+            25% { transform: translate(2px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            75% { transform: translate(1px, 1px) rotate(1deg); }
+        }
+        .shake-letters:hover { animation: letterShake 0.1s infinite; }
+
+        @keyframes inputWiggle {
+            0% { transform: rotate(1deg) scale(1); }
+            50% { transform: rotate(-1deg) scale(1.02); box-shadow: 0 0 20px var(--accent); }
+            100% { transform: rotate(1deg) scale(1); }
+        }
+        .typing-active { animation: inputWiggle 0.3s ease-in-out; }
+
+        .brain-mood {
+            display: inline-block; padding: 5px 15px; border: 2px solid var(--ink);
+            border-radius: 50px; background: white; font-size: 1.1rem;
+            margin-top: 10px; transition: all 0.3s; transform: rotate(-2deg);
+        }
+
+        .chaos-text {
+            position: fixed; pointer-events: none; font-size: 1rem; color: var(--ink);
+            opacity: 0; transition: opacity 0.5s; z-index: 50; font-family: 'Gloria Hallelujah', cursive;
+        }
+
+        .ripple {
+            position: fixed; top: 0; left: 0; width: 150px; height: 150px;
+            pointer-events: none; z-index: -2; opacity: 0.15;
+            background: radial-gradient(circle, var(--accent) 0%, transparent 75%);
+            border-radius: 50%;
+            transition: transform 0.05s linear;
+        }
+
+        /* --- UI Components --- */
+        .container { max-width: 800px; margin: 0 auto; text-align: center; position: relative; }
+        
+        header { margin-bottom: 40px; transform: rotate(-1deg); }
+        h1 { font-family: 'Gloria Hallelujah', cursive; font-size: clamp(2.5rem, 10vw, 4.5rem); color: #ff4d6d; line-height: 1.1; }
+        .subtitle { font-size: 1.5rem; opacity: 0.8; margin-top: 10px; }
+
+        .mode-switcher { display: flex; justify-content: center; gap: 10px; margin-bottom: 30px; flex-wrap: wrap; }
+        .mode-btn {
+            background: rgba(255,255,255,0.1); border: 2px solid var(--ink);
+            padding: 8px 15px; border-radius: 50px; cursor: pointer; font-size: 1.1rem;
+            transition: 0.2s; color: inherit;
+        }
+        .mode-btn.active { background: var(--accent); transform: scale(1.1) rotate(3deg); box-shadow: 4px 4px 0px var(--ink); color: #333; }
+
+        .input-card {
+            background: white; border: 4px solid var(--ink); padding: 30px;
+            border-radius: 20px 60px 25px 70px / 50px 25px 60px 30px;
+            box-shadow: 10px 10px 0px var(--ink); margin-bottom: 50px; transform: rotate(1deg);
+        }
+
+        textarea {
+            width: 100%; border: none; border-bottom: 3px dashed var(--ink);
+            font-size: 1.8rem; outline: none; padding: 10px; background: transparent;
+            margin-bottom: 25px; resize: none; color: #333;
+        }
+
+        .btn {
+            font-family: 'Gloria Hallelujah', cursive; padding: 15px 35px;
+            font-size: 1.6rem; border: 3px solid var(--ink); border-radius: 15px;
+            cursor: pointer; box-shadow: 8px 8px 0px var(--ink); transition: 0.2s;
+        }
+        .btn-main { background: var(--yellow); color: #333; }
+        .btn:hover { transform: scale(1.05) rotate(2deg); }
+        .btn:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px; }
+
+        /* --- Bubble Styles --- */
+        .results-area { display: flex; flex-direction: column; gap: 35px; padding-bottom: 150px; }
+
+        .bubble {
+            max-width: 80%; padding: 25px; border: 3px solid var(--ink);
+            position: relative; font-size: 1.6rem; box-shadow: 8px 8px 0px var(--ink);
+            opacity: 0; transform: scale(0); transition: 0.3s; text-align: left;
+            background: white; color: #333;
+        }
+        .bubble.show { animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        .bubble:nth-child(odd) { align-self: flex-start; border-radius: 30px 30px 30px 0; }
+        .bubble:nth-child(even) { align-self: flex-end; border-radius: 30px 30px 0 30px; }
+
+        .last-bubble { transform: scale(1.1) !important; animation: popIn 0.5s forwards, glowPulse 1s infinite alternate !important; font-size: 1.8rem; }
+
+        /* --- Fun Details --- */
+        .micro-text { position: absolute; font-size: 1rem; opacity: 0.6; pointer-events: none; white-space: nowrap; }
+        .emoji-float { position: fixed; font-size: 3rem; bottom: -100px; animation: drift 5s linear forwards; z-index: -1; }
+
+        /* --- Funny Meme Template (Chaotic Notebook style) --- */
+        #meme-template {
+            width: 700px; padding: 60px; background: var(--paper); color: #333;
+            display: flex; flex-direction: column; gap: 30px; border-radius: 0;
+            position: absolute; left: -9999px; border: 15px solid #333;
+            background-image: 
+                radial-gradient(#ccc 1px, transparent 0),
+                linear-gradient(90deg, rgba(255,0,0,0.05) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+        .meme-header { 
+            display: flex; justify-content: space-between; align-items: start;
+            border-bottom: 5px solid #333; padding-bottom: 20px;
+        }
+        .meme-title { font-family: 'Gloria Hallelujah', cursive; font-size: 3rem; color: #ff4d6d; }
+        .meme-badge { 
+            background: var(--yellow); padding: 5px 15px; border: 3px solid #333;
+            transform: rotate(5deg); font-weight: bold; font-size: 1.2rem;
+        }
+        .meme-thought { 
+            font-size: 2rem; color: #555; font-style: italic; 
+            padding: 20px; background: rgba(255,255,255,0.8); border: 2px dashed #999;
+        }
+        .meme-bubbles { display: flex; flex-direction: column; gap: 20px; position: relative; }
+        .meme-step { 
+            padding: 20px 30px; border-radius: 20px; font-size: 1.6rem; color: #000; 
+            box-shadow: 8px 8px 0px #333; border: 3px solid #333; width: 90%;
+        }
+        .meme-step:nth-child(even) { align-self: flex-end; transform: rotate(2deg); }
+        .meme-step:nth-child(odd) { align-self: flex-start; transform: rotate(-2deg); }
+
+        .panic-meter {
+            margin-top: 20px; border: 4px solid #333; height: 40px; border-radius: 10px; overflow: hidden; position: relative;
+        }
+        .panic-bar { width: 100%; height: 100%; background: linear-gradient(90deg, var(--yellow), var(--pink), red); }
+        .panic-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: bold; color: white; text-shadow: 1px 1px 2px black; }
+
+        .meme-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; font-family: 'Gloria Hallelujah', cursive; color: #333; font-size: 1.5rem; }
+
+        #action-bar { display: none; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); gap: 15px; z-index: 100; flex-wrap: wrap; width: 90%; justify-content: center; }
+        
+        .watermark { 
+            position: fixed; bottom: 20px; right: 20px;
+            font-family: 'Gloria Hallelujah', cursive; font-size: 1.2rem;
+            color: var(--ink); opacity: 0.7; transform: rotate(-3deg);
+            z-index: 1000; border: 3px dashed var(--ink);
+            padding: 10px 20px; border-radius: 15px; background: var(--paper);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            cursor: pointer; pointer-events: auto;
+            user-select: none;
+        }
+        .watermark:hover { 
+            opacity: 1; transform: scale(1.1) rotate(5deg); 
+            background: var(--pink); color: white; border-style: solid;
+        }
+        .watermark:hover::before { content: "piyushhh is overthinking too "; }
+        .watermark:hover span { display: none; }
+        .watermark:active { transform: scale(0.9) rotate(-10deg); }
+        .watermark.spin { animation: spin 0.6s ease-in-out; }
+
+        @keyframes spin { 0% { transform: rotate(-3deg) scale(1.1); } 100% { transform: rotate(357deg) scale(1.1); } }
+    </style>
+</head>
+<body class="funny-mode">
+
+    <div class="ripple" id="bg-ripple"></div>
+
+    <div class="watermark" id="watermark" onclick="this.classList.add('spin'); playSfx(soundLibrary.fahh); setTimeout(()=>this.classList.remove('spin'),600)">
+        <span>made by piyushhh ✏️</span>
+    </div>
+
+    <div class="container">
+        <!-- Floating Doodles & Microtext -->
+        <span class="micro-text" style="top: 10%; left: -0%; transform: rotate(-15deg);">this is getting out of hand</span>
+        <span class="micro-text" style="top: 25%; right: -0%; transform: rotate(10deg);">why am I like this...</span>
+        <span class="micro-text" style="bottom: 15%; left: 0; transform: rotate(-5deg);">brain please stop</span>
+
+        <header>
+            <h1 class="shake-letters">🧠 Mind Mess!</h1>
+            <div class="brain-mood" id="brain-mood-text">brain is calm 😐</div>
+            <p class="subtitle" id="dynamic-subtitle">overthinking things that didn’t even happen 💀</p>
+        </header>
+
+        <div class="mode-switcher">
+            <button class="mode-btn active" onclick="setMode('funny', this)">😂 Funny</button>
+            <button class="mode-btn" onclick="setMode('calm', this)">🌿 Calm</button>
+            <button class="mode-btn" onclick="setMode('dark', this)">💀 Dark</button>
+            <button class="mode-btn" onclick="setMode('insanity', this)">🤡 Insanity</button>
+        </div>
+
+        <section class="input-card" id="inputSection">
+            <textarea id="thoughtInput" rows="2" placeholder="type your unnecessary worry here..."></textarea>
+            <br>
+            <button class="btn btn-main" onclick="startVisualizer()">VIZUALIZE PANIC! 📈</button>
+        </section>
+
+        <div id="loadingState" style="display: none; font-size: 2rem; margin: 40px; color: var(--blue);">🤔 Consulting the Doubt Council...</div>
+
+        <div class="results-area" id="resultsArea"></div>
+    </div>
+
+    <!-- Hidden Chaotic Meme Template -->
+    <div id="meme-template">
+        <div class="meme-header">
+            <div class="meme-title">🧠 brain.exe crashed</div>
+            <div class="meme-badge">DISTRACTED AT 2AM ✅</div>
+        </div>
+        <div class="meme-thought" id="meme-original-thought"></div>
+        <div class="meme-bubbles" id="meme-steps-container"></div>
+        
+        <div class="panic-meter">
+            <div class="panic-bar"></div>
+            <div class="panic-text">STRESS LEVEL: OVER 9000!! 📉</div>
+        </div>
+
+        <div class="meme-footer">
+            <span>CERTIFIED BRAIN MESS 🤡</span>
+            <span style="border: 3px dashed #333; padding: 5px;">made by piyushhh ✏️</span>
+        </div>
+    </div>
+
+    <!-- Hidden Chaotic Meme Template -->
+    <div id="meme-template">
+        <div class="meme-header">
+            <div class="meme-title">🧠 brain.exe crashed</div>
+            <div class="meme-badge">DISTRACTED AT 2AM ✅</div>
+        </div>
+        <div class="meme-thought" id="meme-original-thought"></div>
+        <div class="meme-bubbles" id="meme-steps-container"></div>
+        
+        <div class="panic-meter">
+            <div class="panic-bar"></div>
+            <div class="panic-text">STRESS LEVEL: OVER 9000!! 📉</div>
+        </div>
+
+        <div class="meme-footer">
+            <span>CERTIFIED BRAIN MESS 🤡</span>
+            <span style="border: 2px dashed #333; padding: 5px;">made by piyushhh ✏️</span>
+        </div>
+    </div>
+
+    <div id="action-bar">
+        <button class="btn btn-main" onclick="location.reload()">Reset Brain 🗑️</button>
+        <button class="btn" style="background: var(--pink); color: white;" onclick="modeWorse()">Make it Worse 😈</button>
+        <button class="btn" style="background: var(--blue); color: white;" onclick="captureScreenshot()">Share 📸</button>
+    </div>
+
+    <script>
+        let currentMode = 'funny';
+        let savedThought = "";
+        let savedSteps = [];
+
+        const soundLibrary = {
+            fahh: "Fahhh.mp3",
+            pop: "https://www.soundjay.com/buttons/button-20.mp3"
+        };
+
+        function playSfx(url) {
+            new Audio(url).play().catch(() => {});
+        }
+
+        function setMode(mode, btn) {
+            currentMode = mode;
+            document.body.className = `${mode}-mode`;
+            document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            playSfx(soundLibrary.pop);
+        }
+
+        async function startVisualizer(isWorse = false) {
+            const input = document.getElementById('thoughtInput').value.trim();
+            if(!input) return alert("You gotta worry about something first!");
+
+            savedThought = input;
+            const loading = document.getElementById('loadingState');
+            const results = document.getElementById('resultsArea');
+            const inputSec = document.getElementById('inputSection');
+            
+            if(!isWorse) {
+                results.innerHTML = '';
+                inputSec.style.display = 'none';
+                loading.style.display = 'block';
+            }
+
+            try {
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ thought: input, mode: currentMode })
+                });
+                
+                const data = await response.json();
+                loading.style.display = 'none';
+                document.getElementById('action-bar').style.display = 'flex';
+                
+                savedSteps = data.steps;
+                await renderBubbles(data.steps, currentMode);
+            } catch (error) {
+                loading.style.display = 'none';
+                inputSec.style.display = 'block';
+                alert("Brain crash!");
+            }
+        }
+
+        async function renderBubbles(steps, mode) {
+            const results = document.getElementById('resultsArea');
+            const colors = ['var(--pink)', 'var(--blue)', 'var(--yellow)', 'var(--green)', 'var(--purple)'];
+
+            for(let i = 0; i < steps.length; i++) {
+                const b = document.createElement('div');
+                b.className = 'bubble';
+                if(i === steps.length - 1) b.classList.add('last-bubble');
+                
+                const rot = (Math.random() * 10 - 5).toFixed(1);
+                b.style.setProperty('--rot', `${rot}deg`);
+                b.style.backgroundColor = colors[i % colors.length];
+                b.innerHTML = `<strong>${steps[i]}</strong>`;
+                
+                results.appendChild(b);
+                await new Promise(r => setTimeout(r, mode === 'insanity' ? 400 : 700));
+                
+                b.classList.add('show');
+                playSfx(soundLibrary.fahh);
+                spawnEmoji(mode === 'insanity' ? '🤯' : '🤡');
+
+                window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+            }
+        }
+
+        const placeholders = [
+            "what if I embarrass myself...",
+            "what if everyone hates me...",
+            "why did I say that 😭",
+            "maybe I'll just live in a box 📦",
+            "is the stove still on? 😱"
+        ];
+
+        const moodTexts = [
+            "brain is calm 😐", "brain overclocking 💀", "brain said nope 🤡", 
+            "searching for worries... 🔦", "dangerously curious ⚡", "chaos mode engaged 🔥"
+        ];
+
+        // --- Interaction Logic ---
+        document.getElementById('thoughtInput').addEventListener('input', (e) => {
+            const el = document.getElementById('inputSection');
+            el.classList.add('typing-active');
+            setTimeout(() => el.classList.remove('typing-active'), 300);
+            
+            if (Math.random() > 0.95) {
+                spawnEmoji('⚡');
+                playSfx(soundLibrary.pop);
+            }
+        });
+
+        // Background Ripple Effect
+        document.addEventListener('mousemove', (e) => {
+            const ripple = document.getElementById('bg-ripple');
+            ripple.style.transform = `translate(${e.clientX - 50}px, ${e.clientY - 50}px)`;
+        });
+
+        function spawnEmoji(char) {
+            const e = document.createElement('div');
+            e.className = 'emoji-float';
+            e.innerText = char || '💀';
+            e.style.left = Math.random() * 95 + '%';
+            e.style.cursor = 'pointer';
+            e.style.pointerEvents = 'auto';
+            
+            e.onclick = (event) => {
+                event.stopPropagation();
+                if (Math.random() > 0.5) {
+                    // Multiply!
+                    for(let i=0; i<3; i++) spawnEmoji(char);
+                }
+                e.remove();
+                playSfx(soundLibrary.pop);
+            };
+
+            document.body.appendChild(e);
+            setTimeout(() => e.remove(), 5000);
+        }
+
+        // Random Brain Moods
+        setInterval(() => {
+            const moodEl = document.getElementById('brain-mood-text');
+            moodEl.innerText = moodTexts[Math.floor(Math.random() * moodTexts.length)];
+            moodEl.style.transform = `rotate(${Math.random() * 10 - 5}deg) scale(${1 + Math.random() * 0.1})`;
+        }, 3000);
+
+        // Random Placeholders
+        setInterval(() => {
+            const input = document.getElementById('thoughtInput');
+            if (input.value === "") {
+                input.placeholder = placeholders[Math.floor(Math.random() * placeholders.length)];
+            }
+        }, 4000);
+
+        function triggerChaos() {
+            const texts = ["why are we like this?", "brain stop.", "*intrusive thought*", "HEYYY!", "panic?"];
+            const t = document.createElement('div');
+            t.className = 'chaos-text';
+            t.innerText = texts[Math.floor(Math.random() * texts.length)];
+            t.style.top = Math.random() * 80 + 10 + '%';
+            t.style.left = Math.random() * 80 + 10 + '%';
+            t.style.opacity = '1';
+            document.body.appendChild(t);
+            setTimeout(() => { t.style.opacity = '0'; setTimeout(()=>t.remove(), 500); }, 1500);
+        }
+
+        setInterval(triggerChaos, 6000);
+
+        function modeWorse() {
+            setMode('insanity', document.querySelectorAll('.mode-btn')[3]);
+            startVisualizer(true);
+        }
+
+        // --- Screenshot Logic ---
+        function prepareScreenshot() {
+            const container = document.getElementById('meme-steps-container');
+            const thoughtElement = document.getElementById('meme-original-thought');
+            const colors = ['#ff85a1', '#4cc9f0', '#ffee32', '#6ee7b7', '#b79ced'];
+            
+            thoughtElement.innerText = `Thought: "${savedThought}"`;
+            container.innerHTML = "";
+            
+            savedSteps.forEach((step, i) => {
+                const s = document.createElement('div');
+                s.className = "meme-step";
+                s.style.backgroundColor = colors[i % colors.length];
+                s.innerText = step;
+                container.appendChild(s);
+            });
+        }
+
+        function captureScreenshot() {
+            prepareScreenshot();
+            const meme = document.getElementById('meme-template');
+            
+            html2canvas(meme, {
+                backgroundColor: "#fffef0",
+                scale: 2,
+                logging: false,
+                useCORS: true
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `brain-at-2am-${Date.now()}.png`;
+                link.href = canvas.toDataURL("image/png");
+                link.click();
+            });
+        }
+
+        // Periodic background chaos
+        setInterval(() => spawnEmoji(), 3000);
+    </script>
+</body>
+</html>
