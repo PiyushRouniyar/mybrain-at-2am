@@ -102,15 +102,12 @@ def parse_ai_response(text, thought, mode="funny"):
             data = json.loads(clean_json)
             
             # Validation: Ensure it has steps and mood
-            if "steps" in data and isinstance(data["steps"], list) and len(data["steps"]) >= 3:
+            if "steps" in data and isinstance(data["steps"], list) and len(data["steps"]) >= 1:
                 # Ensure we have exactly 5 steps (pad or trim)
-                steps = data["steps"][:5]
-                while len(steps) < 5:
-                    steps.append("...and then the brain gave up. 😵")
-                data["steps"] = steps
-                data["mood"] = data.get("mood", "neutral")
-                return data
-
+                return {
+                    "steps": data["steps"],
+                    "mood": data.get("mood", "funny")
+                }
         # Layer 2: Plain text split (if AI returns lines instead of JSON)
         lines = [line.strip() for line in text.split('\n') if len(line.strip()) > 5]
         if len(lines) >= 3:
