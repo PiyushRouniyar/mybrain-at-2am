@@ -31,100 +31,100 @@ else:
 
 # --- AI Logic ---
 
-def get_prompt(thought):
+def get_prompt(thought, mode="funny"):
+    # Using a more aggressive "roast" personality to override any previous habits
     return f"""
-User message: "{thought}"
+INSTRUCTIONS:
+You are a savage internet commenter from 2026. 
+You are replying to the user's message with peak sarcasm and brain rot energy.
 
-You are NOT an AI assistant.
-You are a sarcastic internet commenter replying to this message.
+USER INPUT: "{thought}"
 
-Your job:
-React to the message with a funny, sarcastic,savage reply.
+TASK: 
+Generate EXACTLY 5 unique, short, meme-style sarcastic roast replies.
 
-IMPORTANT:
-- You MUST directly react to the user's sentence
-- Do NOT generate thoughts, steps, or analysis
-- Do NOT be philosophical
-- Do NOT overthink
-- Just roast the statement like a comment section
+STRICT REQUIREMENTS:
+1. Length: Each reply must be UNDER 8 words.
+2. Emoji: Include 1 emoji per reply (💀, 😭😭, 🤡, 👁️👄👁️).
+3. Vibe: Instagram/TikTok comment section roasts.
+4. Variety: Each of the 5 replies MUST have a different sentence structure.
+5. NO Thoughts: Do not include "I am worried" or "Hmm" or any AI overthinking.
 
-STYLE:
-- 1 short sentence ONLY (max 10 words)
-- Meme tone (Instagram / TikTok comments)
-- Use sarcasm + exaggeration
-- Add 1 emoji (💀 🤡 😭 🤨)
-
-GOOD EXAMPLES:
-- "bro thinks he knows the script 💀"
-- "ain't no way you said that 😭"
-- "who told you that was happening 🤡"
-- "this is not your timeline 💀"
-
-BAD (NEVER DO THIS):
-- long sentences
-- advice
-- explanations
-- overthinking chains
-
-OUTPUT:
-Return ONLY JSON:
-
+STRICT JSON OUTPUT:
 {{
-  "steps": ["your reply"],
-  "mood": "funny"
+  "steps": [
+    "ROAST 1 💀",
+    "ROAST 2 😭",
+    "ROAST 3 🤡",
+    "ROAST 4 🤨",
+    "ROAST 5 💀"
+  ],
+  "mood": "{mode}"
 }}
 """
 
 def parse_ai_response(text, thought, mode="funny"):
-    logger.info(f"RAW RESPONSE: {text}")
+    logger.info(f"RAW AI RESPONSE: {text}")
 
-    import re, json
+    if not text or not text.strip():
+        return {"steps": [f"bro really thought '{thought}' was worth a reply 💀"], "mood": mode}
 
     try:
-        # Try JSON first
+        # 1. Try to find JSON block
         match = re.search(r'\{.*\}', text, re.DOTALL)
         if match:
             data = json.loads(match.group())
-            if "steps" in data:
+            if "steps" in data and isinstance(data["steps"], list) and len(data["steps"]) >= 1:
                 return {
-                    "steps": data["steps"],
-                    "mood": data.get("mood", "funny")
+                    "steps": [str(s).strip() for s in data["steps"]],
+                    "mood": data.get("mood", mode)
                 }
-
     except Exception as e:
-        logger.warning(f"JSON parsing failed: {e}")
+        logger.warning(f"JSON Parsing failed: {e}")
 
-    # 🔥 MAIN FIX: ALWAYS USE RAW TEXT
-    clean_text = text.strip()
+    # 2. Extract lines if JSON fail or incomplete
+    # Split by newline, remove common bullet points/numbers
+    lines = [
+        re.sub(r'^[\-\d\.\s*]+', '', line).strip().strip('"') 
+        for line in text.split('\n') 
+        if line.strip() and not line.strip().startswith(('{', '}', '"'))
+    ]
+    
+    if lines:
+        return {
+            "steps": lines[:10], # Cap at 10 just in case
+            "mood": mode
+        }
 
-    if not clean_text:
-        clean_text = f"bro what even is '{thought}' 💀"
-
+    # 3. Last fallback: return the raw text as a single reply
     return {
-        "steps": [clean_text],
-        "mood": "funny"
+        "steps": [text.strip()[:100]],
+        "mood": mode
     }
 
 def generate_steps(thought, mode="funny"):
     """Calls Gemini and handles logic failures."""
     if not GEMINI_API_KEY:
-        return None
+        return {"steps": ["API KEY MISSING 💀"], "mood": "anxious"}
     
     try:
-        # Forcing JSON response via config (if library supports it)
+        prompt = get_prompt(thought, mode)
+        logger.info(f"--- SENDING PROMPT ---\n{prompt}")
+        
         response = model.generate_content(
-            get_prompt(thought, mode),
+            prompt,
             generation_config={"response_mime_type": "application/json"}
         )
         
         if not response or not response.text:
+            logger.error("Gemini returned empty response")
             return parse_ai_response("", thought, mode)
             
+        logger.info(f"--- RECEIVED RESPONSE ---\n{response.text}")
         return parse_ai_response(response.text, thought, mode)
         
     except Exception as e:
         logger.error(f"Gemini API failure: {e}")
-        # Always return fallback data instead of None to prevent route crash
         return parse_ai_response("", thought, mode)
 
 # --- Flask Routes ---
