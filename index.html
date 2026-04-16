@@ -208,6 +208,26 @@
         .watermark.spin { animation: spin 0.6s ease-in-out; }
 
         @keyframes spin { 0% { transform: rotate(-3deg) scale(1.1); } 100% { transform: rotate(357deg) scale(1.1); } }
+
+        /* --- Mobile Responsiveness --- */
+        @media (max-width: 600px) {
+            body { padding: 20px 10px; background-size: 20px 20px; }
+            header { margin-bottom: 25px; }
+            h1 { font-size: 3rem; }
+            .subtitle { font-size: 1.2rem; }
+            .mode-switcher { gap: 6px; }
+            .mode-btn { padding: 6px 12px; font-size: 0.9rem; }
+            .input-card { padding: 20px; margin-bottom: 30px; box-shadow: 6px 6px 0px var(--ink); }
+            textarea { font-size: 1.4rem; }
+            .btn { padding: 12px 20px; font-size: 1.2rem; box-shadow: 6px 6px 0px var(--ink); }
+            .bubble { font-size: 1.3rem; padding: 15px; max-width: 90%; box-shadow: 6px 6px 0px var(--ink); }
+            .results-area { gap: 20px; }
+            #action-bar { bottom: 20px; gap: 8px; width: 95%; padding: 0 5%; }
+            .watermark { bottom: 10px; right: 10px; font-size: 0.9rem; padding: 6px 10px; transform: rotate(-3deg) scale(0.9); }
+            .watermark:hover { transform: scale(1) rotate(5deg); }
+            .micro-text { font-size: 0.8rem; }
+            .emoji-float { font-size: 2rem; }
+        }
     </style>
 </head>
 <body class="funny-mode">
