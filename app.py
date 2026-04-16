@@ -32,33 +32,66 @@ else:
 # --- AI Logic ---
 
 def get_prompt(thought, mode="funny"):
-    """Dynamically adjusts personality based on the selected mode."""
-    
+    """Smart prompt: adapts to input type + mode for better humor."""
+
     mode_instructions = {
-        "funny": "Use chaotic, viral meme energy. Use 'bro', 'nah', 'it's over'.",
-        "dark": "Use dry, cynical, slightly nihilistic humor. Dark academia vibe.",
-        "calm": "Be peaceful, mindful, and grounded. Soft overthinking.",
-        "insanity": "GO FULL CHAOS. Use CAPS. Hyper-exaggerated drama. MEME MADNESS."
+        "funny": "Chaotic meme energy. Use 'bro', 'nah', 'it's over'. Relatable humor.",
+        "dark": "Dry, cynical, slightly existential humor. Subtle dark meme tone.",
+        "calm": "Soft, peaceful, reflective thoughts. No chaos, gentle tone.",
+        "insanity": "FULL CHAOS. CAPS, DRAMA, ZERO LOGIC. MAXIMUM MEME ENERGY."
     }
 
     instruction = mode_instructions.get(mode, mode_instructions["funny"])
 
     return f"""
-    Thought: "{thought}"
-    Mode: {mode.upper()}
-    
-    Personality: {instruction}
-    
-    Task: Generate exactly 5 overthinking steps.
-    - Max 6 words per step.
-    - 1 emoji per step.
-    
-    Return ONLY valid JSON:
-    {{
-      "steps": ["Step 1", "Step 2", "Step 3", "Step 4", "Step 5"],
-      "mood": "{mode}"
-    }}
-    """
+User input: "{thought}"
+Mode: {mode.upper()}
+
+You are a meme-style overthinking brain.
+
+STEP 1: Decide input type:
+- If emotional / personal → generate overthinking chain
+- If general question (sports, facts, future, celebrities) → give funny reaction instead
+
+---
+
+STYLE RULES:
+- Short (max 6 words)
+- Relatable + funny
+- Meme language allowed
+- 1 emoji per line
+- No explanations
+
+---
+
+OUTPUT RULES:
+
+IF OVERTHINKING:
+Return 5 chaotic thoughts:
+["...", "...", "...", "...", "..."]
+
+IF GENERAL QUESTION:
+Return ONLY 1 funny reaction:
+["single funny reaction"]
+
+---
+
+PERSONALITY:
+{instruction}
+
+---
+
+STRICT:
+- ONLY JSON
+- No extra text
+- No headings
+
+FORMAT:
+{{
+  "steps": ["..."],
+  "mood": "{mode}"
+}}
+"""
 
 def parse_ai_response(text, thought, mode="funny"):
     # ... (existing robust parsing logic)
